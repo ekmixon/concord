@@ -16,7 +16,7 @@ different systems together using scenarios and plugins created by users.
 
 Dependencies:
 - [Git](https://git-scm.com/) 2.18+
-- [Java 8](https://adoptopenjdk.net/)
+- [Java 11](https://adoptopenjdk.net/)
 - [Docker Community Edition](https://www.docker.com/community-edition)
 - (Optional) [NodeJS and NPM](https://nodejs.org/en/download/) (Node 14 or greater)
 
@@ -48,16 +48,6 @@ Start the console in dev mode by running:
 ```shell
 npm run start
 ```
-
-### Java 11
-
-Use the `jdk11` profile:
-
-```
-./mvnw clean install -DskipTests -Pdocker -Pjdk11
-```
-
-This command builds binaries and Docker images using JDK 11.
 
 ### Integration tests
 

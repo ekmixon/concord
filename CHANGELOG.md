@@ -1,5 +1,13 @@
 # Change log
 
+## [2.x]
+
+### Changed
+
+- project: switch from Java 8 to Java 11.
+
+
+
 ## [1.85.0] - 2021-04-27
 
 ### Added

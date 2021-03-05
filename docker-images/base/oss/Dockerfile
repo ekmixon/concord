@@ -1,7 +1,7 @@
 FROM library/centos:8
 LABEL maintainer="mtkunke@walmartlabs.com"
 
-ARG jdk_version=1.8.0
+ARG jdk_version=11
 
 ENTRYPOINT ["/usr/local/bin/concord_venv/bin/dumb-init", "--"]
 
