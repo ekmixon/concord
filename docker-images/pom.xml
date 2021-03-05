@@ -27,7 +27,7 @@
         <concord.baseDir>/opt/concord</concord.baseDir>
 
         <!-- JDK version to use in the base image and all its descendants -->
-        <jdk.version>1.8.0</jdk.version>
+        <jdk.version>11</jdk.version>
     </properties>
 
     <build>
@@ -83,15 +83,6 @@
             </activation>
             <properties>
                 <docker.skip>false</docker.skip>
-            </properties>
-        </profile>
-        <profile>
-            <id>jdk11</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <properties>
-                <jdk.version>11</jdk.version>
             </properties>
         </profile>
     </profiles>
