@@ -6,6 +6,11 @@
 
 - project: switch from Java 8 to Java 11.
 
+### Breaking
+
+- project: `guava` version was updated from `25.1-jre` to
+`30.1.1-jre`.
+
 
 
 ## [1.85.0] - 2021-04-27
