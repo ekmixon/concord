@@ -55,11 +55,10 @@ public class TemplateScriptProcessor implements PayloadProcessor {
     @Inject
     public TemplateScriptProcessor(ProcessLogManager logManager) {
         this.logManager = logManager;
-        this.scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
+        this.scriptEngine = new ScriptEngineManager().getEngineByName("js");
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Payload process(Chain chain, Payload payload) {
         Path workspace = payload.getHeader(Payload.WORKSPACE_DIR);
 
@@ -87,20 +86,19 @@ public class TemplateScriptProcessor implements PayloadProcessor {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<String, Object> processScript(ProcessKey processKey, Map meta, Path templateMeta) {
-        Object result;
+    private Map<String, Object> processScript(ProcessKey processKey, Map<String, Object> meta, Path templateMeta) {
         try (Reader r = new FileReader(templateMeta.toFile())) {
             Bindings b = scriptEngine.createBindings();
             b.put(INPUT_REQUEST_DATA_KEY, meta != null ? meta : Collections.emptyMap());
 
-            result = scriptEngine.eval(r, b);
+            Object result = scriptEngine.eval(r, b);
             if (!(result instanceof Map)) {
                 throw new ProcessException(processKey, "Invalid template result. Expected a Java Map instance, got " + result);
             }
+            return (Map<String, Object>) result;
         } catch (IOException | ScriptException e) {
             logManager.error(processKey, "Template script execution error", e);
             throw new ProcessException(processKey, "Template script execution error", e);
         }
-        return (Map<String, Object>) result;
     }
 }
