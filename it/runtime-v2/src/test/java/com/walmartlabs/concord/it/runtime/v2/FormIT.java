@@ -29,7 +29,6 @@ import com.walmartlabs.concord.client.FormSubmitResponse;
 import com.walmartlabs.concord.client.ProcessApi;
 import com.walmartlabs.concord.client.ProcessEntry;
 import com.walmartlabs.concord.sdk.MapUtils;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.junit.Rule;
 import org.junit.Test;
 import org.testcontainers.shaded.com.google.common.collect.ImmutableMap;
@@ -247,10 +246,6 @@ public class FormIT {
         proc.assertLog(".*age=" + age + ".*");
     }
 
-    private static void submitForm() {
-
-    }
-
     private static void startCustomFormSession(ConcordRule concord, UUID instanceId, String formName) throws Exception {
         URL url = new URL(concord.apiBaseUrl() + "/api/service/custom_form/" + instanceId + "/" + formName + "/start");
         HttpURLConnection http = (HttpURLConnection)url.openConnection();
@@ -278,30 +273,9 @@ public class FormIT {
             ScriptEngine se = new ScriptEngineManager().getEngineByName("js");
             Object result = se.eval(str);
             assertTrue(result instanceof Map);
-            return (Map<String, Object>) toJavaObject(result);
+            return (Map<String, Object>) result;
         } finally {
             http.disconnect();
-        }
-    }
-
-    private static Object toJavaObject(Object scriptObj) {
-        if (scriptObj instanceof ScriptObjectMirror) {
-            ScriptObjectMirror scriptObjectMirror = (ScriptObjectMirror) scriptObj;
-            if (scriptObjectMirror.isArray()) {
-                List<Object> list = new ArrayList<>();
-                for (Map.Entry<String, Object> entry : scriptObjectMirror.entrySet()) {
-                    list.add(toJavaObject(entry.getValue()));
-                }
-                return list;
-            } else {
-                Map<String, Object> map = new HashMap<>();
-                for (Map.Entry<String, Object> entry : scriptObjectMirror.entrySet()) {
-                    map.put(entry.getKey(), toJavaObject(entry.getValue()));
-                }
-                return map;
-            }
-        } else {
-            return scriptObj;
         }
     }
 }

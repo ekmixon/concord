@@ -25,13 +25,11 @@ import com.walmartlabs.concord.server.process.Payload;
 import com.walmartlabs.concord.server.process.ProcessException;
 import com.walmartlabs.concord.server.process.logs.ProcessLogManager;
 import com.walmartlabs.concord.server.sdk.ProcessKey;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -85,17 +83,6 @@ public class DependenciesProcessor implements PayloadProcessor {
 
         if (o instanceof Collection) {
             return (Collection<String>) o;
-        }
-
-        if (o instanceof ScriptObjectMirror) {
-            ScriptObjectMirror m = (ScriptObjectMirror) o;
-            if (!m.isArray()) {
-                logManager.error(processKey, "Invalid dependencies object type. Expected a JavaScript array, got: " + m);
-                throw new ProcessException(processKey, "Invalid dependencies object type. Expected a JavaScript array, got: " + m);
-            }
-
-            String[] as = m.to(String[].class);
-            return Arrays.asList(as);
         }
 
         logManager.error(processKey, "Invalid dependencies object type. Expected an array or a collection, got: " + o.getClass());

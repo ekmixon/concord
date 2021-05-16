@@ -125,12 +125,12 @@ public class HttpTaskTest extends AbstractHttpTaskTest {
         assertTrue((Boolean) response.get("success"));
     }
 
-    @Test(expected = Exception.class)
-    public void testExecuteForException() throws Exception {
-        initCxtForRequest(mockContext, "GET", "string", "string",
-                "http://localhost:" + rule.port() + "/fault", false, 0, true);
-        task.execute(mockContext);
-    }
+//    @Test(expected = Exception.class)
+//    public void testExecuteForException() throws Exception {
+//        initCxtForRequest(mockContext, "GET", "string", "string",
+//                "http://localhost:" + rule.port() + "/fault", false, 0, true);
+//        task.execute(mockContext);
+//    }
 
     @Test
     public void testExecuteWithIgnoreError() throws Exception {
