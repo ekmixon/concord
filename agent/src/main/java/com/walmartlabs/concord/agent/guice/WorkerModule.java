@@ -100,7 +100,5 @@ public class WorkerModule extends AbstractModule {
         bind(LogAppender.class).to(CombinedLogAppender.class);
 
         bind(AgentImportManager.class).toProvider(AgentImportManagerProvider.class);
-
-        bind(DependencyManagerConfiguration.class).toProvider(AgentDependencyManagerConfigurationProvider.class);
     }
 }

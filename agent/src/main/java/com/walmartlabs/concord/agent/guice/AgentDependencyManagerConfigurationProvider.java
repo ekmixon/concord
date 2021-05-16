@@ -24,10 +24,12 @@ import com.walmartlabs.concord.agent.cfg.AgentConfiguration;
 import com.walmartlabs.concord.dependencymanager.DependencyManagerConfiguration;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 @Singleton
+@Named
 public class AgentDependencyManagerConfigurationProvider implements Provider<DependencyManagerConfiguration> {
 
     private final AgentConfiguration cfg;
