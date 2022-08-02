@@ -63,12 +63,22 @@ class CallbackModule(CallbackBase):
             return str(uuid.uuid4())
 
     def _handle_event(self, type, event):
-        self.outFile.write(json.dumps({
-            'eventType': type,
-            'eventDate': datetime.datetime.utcnow().isoformat() + 'Z',
-            'data': dict(event, **{'parentCorrelationId': self.eventCorrelationId,
-                                   'playbookId': self.playbookId})
-        }))
+        self.outFile.write(
+            json.dumps(
+                {
+                    'eventType': type,
+                    'eventDate': f'{datetime.datetime.utcnow().isoformat()}Z',
+                    'data': dict(
+                        event,
+                        **{
+                            'parentCorrelationId': self.eventCorrelationId,
+                            'playbookId': self.playbookId,
+                        },
+                    ),
+                }
+            )
+        )
+
         self.outFile.write('<~EOL~>\n')
         self.outFile.flush()
 
@@ -104,20 +114,19 @@ class CallbackModule(CallbackBase):
             return (obj[:self.HALF_MAX_STRING_LEN] +
                     '...[skipped ' + str(overlimit) + ' bytes]...' +
                     obj[len(obj) - self.HALF_MAX_STRING_LEN:]) \
-                if overlimit > self.OVERLIMIT_STRING_LEN else obj
+                    if overlimit > self.OVERLIMIT_STRING_LEN else obj
         elif isinstance(obj, list):
             overlimit = len(obj) - self.MAX_ARRAY_LEN
-            if overlimit > self.OVERLIMIT_ARRAY_LEN:
-                copy = [self._trunc_long_items(o) for o in obj[:self.HALF_MAX_ARRAY_LENGTH]]
-                copy.append('[skipped ' + str(overlimit) + ' lines]')
-                copy += [self._trunc_long_items(o) for o in obj[len(obj) - self.HALF_MAX_ARRAY_LENGTH:]]
-                return copy
-            else:
+            if overlimit <= self.OVERLIMIT_ARRAY_LEN:
                 return [self._trunc_long_items(o) for o in obj]
+            copy = [self._trunc_long_items(o) for o in obj[:self.HALF_MAX_ARRAY_LENGTH]]
+            copy.append(f'[skipped {str(overlimit)} lines]')
+            copy += [self._trunc_long_items(o) for o in obj[len(obj) - self.HALF_MAX_ARRAY_LENGTH:]]
+            return copy
         elif isinstance(obj, tuple):
             return tuple(self._trunc_long_items(o) for o in obj)
         elif isinstance(obj, dict):
-            return dict((k, self._trunc_long_items(v)) for (k,v) in obj.items())
+            return {k: self._trunc_long_items(v) for (k,v) in obj.items()}
         elif isinstance(obj, AnsibleUnsafeText):
             return self._trunc_long_items(str(obj))
         else:
@@ -261,9 +270,7 @@ class CallbackModule(CallbackBase):
 
     @staticmethod
     def _get_playbook_status(stats):
-        if len(stats.failures) > 0 or len(stats.dark) > 0:
-            return 'FAILED'
-        return 'OK'
+        return 'FAILED' if len(stats.failures) > 0 or len(stats.dark) > 0 else 'OK'
 
     ### Ansible callbacks ###
 

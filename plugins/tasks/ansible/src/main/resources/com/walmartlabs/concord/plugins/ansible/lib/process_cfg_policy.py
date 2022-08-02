@@ -22,7 +22,7 @@ class ProcessCfgPolicy:
         verbose_limits = {'maxHosts': None, 'maxTotalWork': None}
 
         if os.path.isfile(rule_file):
-            print("Loading policy from {}".format(rule_file))
+            print(f"Loading policy from {rule_file}")
             policy_rules = json.load(open(rule_file))
 
             try:

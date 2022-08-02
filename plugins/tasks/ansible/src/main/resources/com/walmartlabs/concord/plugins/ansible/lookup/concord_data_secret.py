@@ -12,8 +12,6 @@ class LookupModule(LookupBase):
 
     def run(self, terms, variables, **kwargs):
 
-        ret = []
-
         argsLen = len(terms)
         if argsLen < 2:
             raise AnsibleError('Invalid lookup format. Expected: [orgName], secretName, storePassword')
@@ -30,9 +28,12 @@ class LookupModule(LookupBase):
         concordInstanceId = os.environ['CONCORD_INSTANCE_ID']
         concordSessionToken = os.environ['CONCORD_SESSION_TOKEN']
 
-        headers = {'X-Concord-SessionToken': concordSessionToken,
-                   'User-Agent': 'ansible (txId: ' + concordInstanceId + ')'}
-        url = concordBaseUrl + '/api/v1/org/' + orgName + '/secret/' + secretName + '/data'
+        headers = {
+            'X-Concord-SessionToken': concordSessionToken,
+            'User-Agent': f'ansible (txId: {concordInstanceId})',
+        }
+
+        url = f'{concordBaseUrl}/api/v1/org/{orgName}/secret/{secretName}/data'
         multipartInputDict = {}
         if storePassword is not None:
             multipartInputDict = {'storePassword' : storePassword}
@@ -43,12 +44,12 @@ class LookupModule(LookupBase):
         r = requests.post(url, headers=headers, files=multipartInputDict)
 
         if r.status_code == requests.codes.not_found:
-            raise AnsibleError('Secret ' + orgName + '/' + secretName + ' not found')
+            raise AnsibleError(f'Secret {orgName}/{secretName} not found')
 
         if r.status_code != requests.codes.ok:
             resp = self.get_json(r)
 
-            msg = 'Error accessing secret ' + orgName + '/' + secretName + ': '
+            msg = f'Error accessing secret {orgName}/{secretName}: '
             if resp:
                 try:
                     raise AnsibleError(msg + resp[0]['message'])
@@ -58,11 +59,9 @@ class LookupModule(LookupBase):
             if r.text:
                 raise AnsibleError(msg + r.text)
 
-            raise AnsibleError(msg + 'Invalid server response: ' + str(r.status_code))
+            raise AnsibleError(f'{msg}Invalid server response: {str(r.status_code)}')
 
-        ret.append(str(r.text))
-
-        return ret
+        return [str(r.text)]
 
     def get_json(self, r):
         try:

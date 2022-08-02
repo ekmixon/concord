@@ -15,7 +15,7 @@ def _parse_parameters(term):
     if len(first_split) <= 1:
         # Only a single argument given, therefore it's a queryName
         queryName = term
-        params = dict()
+        params = {}
     else:
         queryName = first_split[0]
         params = parse_kv(first_split[1])
@@ -49,15 +49,19 @@ class LookupModule(LookupBase):
         concordInstanceId = os.environ['CONCORD_INSTANCE_ID']
         concordSessionToken = os.environ['CONCORD_SESSION_TOKEN']
 
-        headers = {'X-Concord-SessionToken': concordSessionToken,
-                   'Content-type': 'application/json',
-                   'User-Agent': 'ansible (txId: ' + concordInstanceId + ')'}
-        url = concordBaseUrl + '/api/v1/org/' + orgName + '/inventory/' + inventoryName + '/query/' + queryName + "/exec"
+        headers = {
+            'X-Concord-SessionToken': concordSessionToken,
+            'Content-type': 'application/json',
+            'User-Agent': f'ansible (txId: {concordInstanceId})',
+        }
+
+        url = f'{concordBaseUrl}/api/v1/org/{orgName}/inventory/{inventoryName}/query/{queryName}/exec'
+
 
         r = requests.post(url, headers=headers, data=json.dumps(queryParams))
 
         if r.status_code != requests.codes.ok:
-            raise AnsibleError('Invalid server response: ' + str(r.status_code))
+            raise AnsibleError(f'Invalid server response: {str(r.status_code)}')
 
         resultElement = resultParams['result']
         if resultElement != -1:

@@ -23,10 +23,10 @@ class TaskPolicy:
     def __init__(self):
         rule_file = os.environ['CONCORD_POLICY']
 
-        self.policy_rules = dict()
+        self.policy_rules = {}
 
         if os.path.isfile(rule_file):
-            print("Loading policy from {}".format(rule_file))
+            print(f"Loading policy from {rule_file}")
             self.policy_rules = json.load(open(rule_file))
 
     def is_deny(self, task):
@@ -71,18 +71,19 @@ class TaskPolicy:
         return string.Formatter().vformat(rule['msg'], (), SafeDict(args_dict))
 
     def _match_ansible_rule(self, rule, task_action, task_args):
-        display.vv("match_ansible_rule: {} on {}".format(rule, task_action, task_args))
+        display.vv(f"match_ansible_rule: {rule} on {task_action}")
 
-        if not self._match(rule['action'], task_action):
-            return False
-
-        if 'params' in rule and not self._match_task_args(rule['params'], task_args):
-            return False
-
-        return True
+        return (
+            bool(
+                'params' not in rule
+                or self._match_task_args(rule['params'], task_args)
+            )
+            if self._match(rule['action'], task_action)
+            else False
+        )
 
     def _match_task_args(self, rule_args, task_args):
-        display.vv("match_task_args: {} on {}".format(rule_args, task_args))
+        display.vv(f"match_task_args: {rule_args} on {task_args}")
 
         matched = False
         for a in rule_args:
@@ -97,7 +98,7 @@ class TaskPolicy:
         return matched
 
     def _match_values(self, patterns, value):
-        display.vv("match_values: {} on {}".format(patterns, value))
+        display.vv(f"match_values: {patterns} on {value}")
 
         if isinstance(value, ansible.parsing.yaml.objects.AnsibleUnicode):
             value = str(value)
@@ -110,7 +111,7 @@ class TaskPolicy:
         return False
 
     def _enrich_args(self, action, args):
-        display.vv("enrich_args: {} ({})".format(action, args))
+        display.vv(f"enrich_args: {action} ({args})")
 
         new_args = args
         if action == 'maven_artifact':
@@ -123,8 +124,8 @@ class TaskPolicy:
     def _build_artifact_url(self, args):
         name = args['artifact_id'] + '-' + args['version']
         if 'classifier' in args:
-            name = name + '-' + args['classifier']
-        name = name + '.' + args.get('extension', 'jar')
+            name = f'{name}-' + args['classifier']
+        name = f'{name}.' + args.get('extension', 'jar')
 
         return args['repository_url'].rstrip('/') + '/' + args['group_id'].replace('.', '/') + '/' + args['artifact_id'] + '/' + args['version'] + '/' + name
 

@@ -30,15 +30,15 @@ class CallbackModule(CallbackBase):
         if not self.out_vars:
             return
 
-        result = dict()
+        result = {}
 
         all_vars = self.var_manager._nonpersistent_fact_cache
 
         for fact in self.out_vars:
-            fact_by_host = dict()
-            for host, vars in all_vars.items():
-                if fact in vars:
-                    fact_by_host[host] = vars[fact]
+            fact_by_host = {
+                host: vars[fact] for host, vars in all_vars.items() if fact in vars
+            }
+
             result[fact] = fact_by_host
 
         if '_stats' in self.out_vars:

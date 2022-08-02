@@ -14,9 +14,7 @@ def mkdir_p(path):
     try:
         os.makedirs(path)
     except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
+        if exc.errno != errno.EEXIST or not os.path.isdir(path):
             raise
 
 
@@ -33,7 +31,7 @@ class CallbackModule(CallbackBase):
         target_dir = self.base_dir;
         mkdir_p(target_dir)
 
-        target_filename = target_dir + "/ansible_stats.json"
+        target_filename = f"{target_dir}/ansible_stats.json"
         target_file = open(target_filename, "w")
         target_file.write(json.dumps(data, indent=2))
 
